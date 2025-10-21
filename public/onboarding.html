@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maytech & AKQA Onboarding</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="onboarding-styles.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Maytech & AKQA Onboarding</h2>
+            </div>
+            <div class="nav-user">
+                <span id="user-name">Welcome</span>
+                <button id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-header">
+            <h3>Your Onboarding Progress</h3>
+            <span id="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="progress-steps">
+            <div class="step" data-step="0">
+                <div class="step-circle">1</div>
+                <span>Partnership</span>
+            </div>
+            <div class="step" data-step="1">
+                <div class="step-circle">2</div>
+                <span>FAQ</span>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">3</div>
+                <span>Policies</span>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">4</div>
+                <span>Responsibilities</span>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-circle">5</div>
+                <span>Workflows</span>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-circle">6</div>
+                <span>Workplace</span>
+            </div>
+            <div class="step" data-step="6">
+                <div class="step-circle">7</div>
+                <span>Complete</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="onboarding-content">
+        <!-- Section 0: Partnership -->
+        <section id="section-0" class="content-section active">
+            <div class="container">
+                <h2 class="section-title">Maytech & AKQA Partnership</h2>
+                <div class="partnership-grid">
+                    <div class="partnership-card">
+                        <h3>Our Vision</h3>
+                        <p>Maytech serves as AKQA's local partner in Sri Lanka, supporting its vision to establish and expand a Center of Excellence in the country.</p>
+                    </div>
+                    <div class="partnership-card">
+                        <h3>Maytech's Role</h3>
+                        <ul>
+                            <li>Talent acquisition and onboarding</li>
+                            <li>Sourcing and screening qualified candidates</li>
+                            <li>Conducting initial interviews and assessments</li>
+                            <li>Facilitating onboarding process for new hires</li>
+                            <li>Providing necessary infrastructure</li>
+                            <li>Fostering a supportive work culture</li>
+                            <li>Setting policies and frameworks</li>
+                        </ul>
+                    </div>
+                    <div class="partnership-card">
+                        <h3>AKQA's Role</h3>
+                        <ul>
+                            <li>Project management and delivery</li>
+                            <li>Defining project scope, timelines, and deliverables</li>
+                            <li>Technical guidance and mentorship</li>
+                            <li>Quality control and project success</li>
+                            <li>Technical skill development and training</li>
+                            <li>Professional development opportunities</li>
+                            <li>Career growth support</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pricing-section">
+                    <h3>Understanding Our Partnership Model</h3>
+                    <div class="pricing-formula">
+                        <div class="formula-box">Staff Salary</div>
+                        <span class="plus">+</span>
+                        <div class="formula-box">Seat Fee</div>
+                        <span class="plus">+</span>
+                        <div class="formula-box">10% Margin</div>
+                        <span class="equals">=</span>
+                        <div class="formula-box result">Chargeable Cost to AKQA</div>
+                    </div>
+
+                    <div class="seat-fee-info">
+                        <h4>What is the Seat Fee?</h4>
+                        <p>The Seat Fee is an approved cost by AKQA which covers operational expenses:</p>
+                        <div class="seat-fee-grid">
+                            <div class="fee-item">
+                                <h5>Equipment</h5>
+                                <p>Laptop, monitors, headsets, wireless mouse, etc.</p>
+                            </div>
+                            <div class="fee-item">
+                                <h5>Office Space</h5>
+                                <p>Floor space, electricity, water, rent, cleaning</p>
+                            </div>
+                            <div class="fee-item">
+                                <h5>Perishables</h5>
+                                <p>Tea, coffee, water, office snacks, lunch vouchers</p>
+                            </div>
+                            <div class="fee-item">
+                                <h5>IT Software</h5>
+                                <p>HR software, Office365, device management, IT support</p>
+                            </div>
+                            <div class="fee-item">
+                                <h5>HR & Administration</h5>
+                                <p>Human resourcing, payroll fees</p>
+                            </div>
+                            <div class="fee-item">
+                                <h5>Employee Incentives</h5>
+                                <p>Christmas party, events, awards, etc.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alignment-info">
+                        <h4>Mutual Alignment</h4>
+                        <ul>
+                            <li><strong>Cost Optimisation:</strong> Partnership with Maytech leverages our lower operating cost base</li>
+                            <li><strong>Long-Term Sustainability:</strong> Maintaining a low corporate cost structure is crucial for both AKQA's & Maytech's success</li>
+                            <li><strong>Employee Investment:</strong> Reduced corporate costs enable better alignment for enhanced employee remuneration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: FAQ -->
+        <section id="section-1" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Answers to Common Questions</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>Salary & Payments</h3>
+                        <p>Payroll is processed between <strong>6th and 9th</strong> of each month.</p>
+                        <p>Funds are credited into your nominated dollar account in AUD. We will provide you with a recipient created tax invoice (RCTI) to meet your compliance requirements.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>What is the leave request process?</h3>
+                        <ol>
+                            <li>You need to gain approval from your AKQA direct report before applying for leave</li>
+                            <li>Once granted, please apply via BetterHR and state that you have prior approval from your line manager</li>
+                        </ol>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>What if I have a HR related question?</h3>
+                        <p>For any HR-related inquiries, including benefits, leave entitlements, and policies, please reach out to the <strong>Maytech HR Manager</strong>, who will be your primary point of contact.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Whom should I contact regarding general work-related matters?</h3>
+                        <p>Your primary point of contact for work-related queries, concerns, and suggestions is the <strong>Director of Engineering and Technology</strong>. They will serve as your main resource for addressing or escalating any issues related to your tasks.</p>
+                        <p>If the outcome is unsatisfactory, you may escalate the matter to <strong>James Freeman, the Managing Partner of Maytech Holdings</strong>.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Do I need to check in and out daily on BetterHR?</h3>
+                        <p>Yes, regardless of whether you are in the office or remote, you are required to check in/out via the BetterHR application.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Policies - Simplified for space -->
+        <section id="section-2" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Policies & Procedures</h2>
+                <p class="section-intro">It's important to understand the policies and procedures that guide our operations. They ensure a fair and consistent work environment for everyone.</p>
+
+                <div class="policy-categories">
+                    <div class="policy-category">
+                        <h3>Hybrid Work Policy</h3>
+                        <div class="hybrid-work-details">
+                            <div class="requirement-box">
+                                <h4>Requirements</h4>
+                                <ul>
+                                    <li>2 days a week in the office</li>
+                                    <li>1 day encouraged in the office</li>
+                                    <li>Remainder at employee's discretion</li>
+                                </ul>
+                            </div>
+                            <div class="requirement-box">
+                                <h4>Required Office Days</h4>
+                                <ul>
+                                    <li><strong>Tuesday</strong> - Required</li>
+                                    <li><strong>Thursday</strong> - Required</li>
+                                    <li><strong>Wednesday</strong> - Encouraged</li>
+                                </ul>
+                            </div>
+                            <div class="requirement-box">
+                                <h4>Important Notes</h4>
+                                <ul>
+                                    <li>Maytech sets the policy</li>
+                                    <li>2 days a week in office is a requirement of employment</li>
+                                    <li>Revised policy needs to be acknowledged in BetterHR</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="policy-category">
+                        <h3>Leave & Attendance - Event Based</h3>
+                        <div class="leave-grid">
+                            <div class="leave-card">
+                                <h4>Paid Maternity Leave</h4>
+                                <ul>
+                                    <li><strong>First and Second Child:</strong> 84 days of paid leave</li>
+                                    <li><strong>Third and Subsequent Child:</strong> 42 days of paid leave</li>
+                                    <li>Eligibility: Only available for Confirmed Employees</li>
+                                    <li>Application to be made 12 weeks prior to expected date</li>
+                                </ul>
+                            </div>
+                            <div class="leave-card">
+                                <h4>Paid Paternity Leave</h4>
+                                <ul>
+                                    <li>3 days of Paid Leave</li>
+                                    <li>Eligibility: Only available for Confirmed Employees</li>
+                                    <li>Must be taken within 30 days of the child's birth</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="policy-category">
+                        <h3>General Security</h3>
+                        <div class="security-grid">
+                            <div class="security-item">
+                                <h4>Visitors & Guests</h4>
+                                <ul>
+                                    <li>Visitors must sign in with valid ID</li>
+                                    <li>Wear visitor badge visibly</li>
+                                    <li>Pre-approval required (24 hours notice)</li>
+                                    <li>Be cautious with sensitive information when contractors are present</li>
+                                </ul>
+                            </div>
+                            <div class="security-item">
+                                <h4>Asset Security</h4>
+                                <ul>
+                                    <li>No unauthorized 3rd party applications</li>
+                                    <li>No personal USB drives without approval</li>
+                                    <li>Report any loss, damage, or unauthorized use immediately</li>
+                                    <li>Personal phones must use MayTech_BOYD network</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="policy-access">
+                    <h3>Accessing Company Policies</h3>
+                    <div class="access-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <p>Access Learning Library from BetterHR Home Screen</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <p>Open, View and Acknowledge each policy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Responsibilities -->
+        <section id="section-3" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Who Does What</h2>
+
+                <div class="responsibilities-grid">
+                    <div class="resp-category">
+                        <h3>Core Responsibilities</h3>
+                        <table class="resp-table">
+                            <thead>
+                                <tr>
+                                    <th>Function</th>
+                                    <th>Responsibility</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Setting and managing KRA and KPI</td>
+                                    <td><span class="badge badge-akqa">AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Project & task assignment and guidance</td>
+                                    <td><span class="badge badge-akqa">AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Job specific software procurement and setup</td>
+                                    <td><span class="badge badge-akqa">AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Role based policies and mandates</td>
+                                    <td><span class="badge badge-both">MAYTECH & AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Performance reviews</td>
+                                    <td><span class="badge badge-akqa">AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Learning & Development</td>
+                                    <td><span class="badge badge-both">MAYTECH & AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Culture and Engagement</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="resp-category">
+                        <h3>General Responsibilities</h3>
+                        <table class="resp-table">
+                            <thead>
+                                <tr>
+                                    <th>Function</th>
+                                    <th>Responsibility</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Physical hardware and peripherals</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Office 365 and HRM Applications</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                                <tr>
+                                    <td>VPN setup & workbench setup</td>
+                                    <td><span class="badge badge-akqa">AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>IT Support</td>
+                                    <td><span class="badge badge-both">MAYTECH & AKQA</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Payroll</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Incident Management</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                                <tr>
+                                    <td>HR</td>
+                                    <td><span class="badge badge-maytech">MAYTECH</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Workflows -->
+        <section id="section-4" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Workflows</h2>
+                <p class="section-intro">Standard workflows for common requests and procedures</p>
+
+                <div class="workflows-grid">
+                    <div class="workflow-card">
+                        <h3>Hardware Request</h3>
+                        <p>New hardware requests are submitted via online form. Requests must include:</p>
+                        <ul>
+                            <li>Clear justification outlining the purpose</li>
+                            <li>Impact on work or team performance</li>
+                            <li>Resulting benefits</li>
+                        </ul>
+                        <p>Line Manager approval is required before forwarding to Management or AKQA for review and processing.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <h3>IT Support</h3>
+                        <p>For Maytech IT-related issues, please submit a request via the designated form. A member of our team will process and escalate the matter if required.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <h3>Incident Response</h3>
+                        <p>Prompt reporting of all workplace incidents is <strong>required</strong>. Use the designated online form.</p>
+                        <p>Common reportable incidents include:</p>
+                        <ul>
+                            <li>Building/maintenance issues</li>
+                            <li>Theft/loss</li>
+                            <li>Physical incidents (injuries, falls, etc.)</li>
+                            <li>Safety hazards</li>
+                        </ul>
+                    </div>
+
+                    <div class="workflow-card">
+                        <h3>Expense Reimbursement</h3>
+                        <p>Expense claims are submitted via online form. All expense claims will be reviewed and processed by finance in addition to your immediate supervision where applicable.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-note">
+                    <p><strong>Note:</strong> Form links will be sent via email and shared in presentations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Workplace -->
+        <section id="section-5" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Interacting in the Workplace</h2>
+
+                <div class="workplace-content">
+                    <div class="guideline-section">
+                        <h3>Client Confidentiality - Foundations</h3>
+                        <p class="important-note">As you've all signed Non-Disclosure Agreements (NDAs) with Maytech, it's crucial to remember that these agreements extend to all client interactions.</p>
+
+                        <div class="confidentiality-grid">
+                            <div class="conf-item">
+                                <h4>Information Sensitivity</h4>
+                                <ul>
+                                    <li>All client information is considered confidential unless explicitly designated otherwise</li>
+                                    <li>Examples include: client financial data, strategic plans, customer lists, internal communications, personal matters, intellectual property, codebase repositories</li>
+                                </ul>
+                            </div>
+                            <div class="conf-item">
+                                <h4>Data Security</h4>
+                                <ul>
+                                    <li>Handle all client data with utmost care and security</li>
+                                    <li>Use company-issued devices only</li>
+                                    <li>Adhere to all data security protocols</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section">
+                        <h3>Maintaining Neutrality and Professionalism</h3>
+                        <div class="neutrality-grid">
+                            <div class="neutrality-column">
+                                <h4>Let's Do a U-Turn From These:</h4>
+                                <ul>
+                                    <li>Avoid getting drawn into office gossip, rumors, or internal debates</li>
+                                    <li>Stay out of arguments or disagreements between client colleagues</li>
+                                    <li>Avoid taking sides in internal conflicts</li>
+                                    <li>Do not participate in internal client surveys or petitions unless specifically directed</li>
+                                </ul>
+                            </div>
+                            <div class="neutrality-column">
+                                <h4>Let's Focus on These:</h4>
+                                <ul>
+                                    <li>Maintain a neutral and professional stance</li>
+                                    <li>Focus on de-escalation when observing conflicts</li>
+                                    <li>Communicate respectfully and professionally</li>
+                                    <li>Remember your actions reflect on both you and Maytech</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="key-message">Deliver excellence, avoid distractions!</p>
+                    </div>
+
+                    <div class="guideline-section">
+                        <h3>Employee Support & Wellbeing</h3>
+                        <blockquote>
+                            "At Maytech we prioritize the health and wellbeing of our employees because we understand that their success is integral to our collective success."
+                        </blockquote>
+
+                        <div class="wellbeing-grid">
+                            <div class="wellbeing-item">
+                                <h4>Employee Support</h4>
+                                <ul>
+                                    <li>Employee Assistance Programs</li>
+                                    <li>Grievance Management</li>
+                                    <li>Harassment and Bullying Support</li>
+                                </ul>
+                            </div>
+                            <div class="wellbeing-item">
+                                <h4>Employee Wellbeing</h4>
+                                <ul>
+                                    <li>Health Insurance</li>
+                                    <li>Team Bonding Events</li>
+                                    <li>Reward Programs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Completion -->
+        <section id="section-6" class="content-section">
+            <div class="container">
+                <div class="completion-container">
+                    <div class="completion-icon">✓</div>
+                    <h2 class="section-title">Congratulations!</h2>
+                    <p class="completion-text">You have successfully completed the Maytech & AKQA onboarding program.</p>
+                    <p class="completion-subtext">You're now ready to begin your journey with us. Welcome to the team!</p>
+
+                    <div class="next-steps">
+                        <h3>Next Steps</h3>
+                        <ul>
+                            <li>Check your email for further instructions</li>
+                            <li>Complete your BetterHR profile</li>
+                            <li>Schedule a meeting with your line manager</li>
+                            <li>Join the team communication channels</li>
+                        </ul>
+                    </div>
+
+                    <button class="acknowledge-btn completed-btn">Start Your Journey</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Acknowledgment Area -->
+        <div class="acknowledgment-area">
+            <div class="container">
+                <div class="acknowledgment-box">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="acknowledge-checkbox">
+                        <span class="checkmark"></span>
+                        <span class="acknowledge-text">I have read and understood this section</span>
+                    </label>
+                    <button id="acknowledge-btn" class="acknowledge-btn" disabled>Acknowledge & Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <div class="container">
+                <button id="prev-btn" class="nav-btn prev-btn" disabled>← Previous</button>
+                <button id="next-btn" class="nav-btn next-btn" disabled>Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="onboarding.js"></script>
+</body>
+</html>
