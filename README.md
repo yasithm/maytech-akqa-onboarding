@@ -1,145 +1,222 @@
-# Maytech & AKQA Onboarding Website
+# Maytech & AKQA Onboarding System
 
-A comprehensive onboarding website for new employees joining the Maytech and AKQA partnership in Sri Lanka.
+A comprehensive employee onboarding platform for new staff joining the Maytech and AKQA partnership in Sri Lanka.
 
 ## Overview
 
-This website serves as a central resource for understanding the partnership between Maytech and AKQA, including roles, responsibilities, policies, and best practices when working with clients.
+This application provides a complete onboarding solution with staff authentication, sequential learning modules, progress tracking, and administrative oversight. New employees must go through each section and acknowledge their understanding before proceeding to the next.
 
 ## Features
 
-- **Responsive Design**: Fully responsive layout that works on desktop, tablet, and mobile devices
-- **Modern UI**: Clean, professional design with smooth animations and transitions
-- **Comprehensive Information**: Seven main sections covering all aspects of onboarding
-- **Easy Navigation**: Sticky navigation bar with smooth scrolling
-- **Interactive Elements**: Hover effects, animated content, and scroll-to-top button
-- **Accessibility**: Keyboard navigation support and semantic HTML
+### For Staff
+- **Secure Login**: Individual staff accounts with secure authentication
+- **Sequential Learning**: Navigate through 7 comprehensive onboarding sections
+- **Progress Tracking**: Visual progress indicator showing completion status
+- **Acknowledgment System**: Must acknowledge understanding of each section before proceeding
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
+- **Session Persistence**: Resume where you left off
 
-## Sections
+### For Administrators
+- **Admin Dashboard**: Real-time overview of all staff onboarding progress
+- **User Management**: Create new staff accounts
+- **Progress Monitoring**: Track completion status and dates
+- **Statistics**: View overall completion metrics
+- **Comprehensive Reporting**: Detailed progress breakdown per employee
 
-### 1. Home
-Welcome section with overview of the partnership
+## Onboarding Sections
 
-### 2. Partnership
-- Maytech & AKQA vision and roles
-- Pricing model explanation
-- Seat fee breakdown
-- Mutual alignment benefits
-
-### 3. FAQ
-Common questions about:
-- Salary and payments
-- Leave requests
-- HR inquiries
-- Work-related matters
-- BetterHR check-in/out requirements
-
-### 4. Policies & Procedures
-- Core policies list
-- Hybrid work policy (2 days/week in office - Tues & Thurs required)
-- Leave & Attendance (Maternity and Paternity)
-- General security guidelines
-- Orion City security requirements (lanyard policy)
-- Policy access instructions
-
-### 5. Responsibilities
-Detailed breakdown of who does what:
-- Core responsibilities (AKQA, Maytech, or both)
-- General responsibilities
-- Clear role delineation
-
-### 6. Workflows
-Standard procedures for:
-- Hardware requests
-- IT support
-- Incident reporting
-- Expense reimbursement
-
-### 7. Workplace Guidelines
-- Client confidentiality foundations
-- Confidentiality in practice
-- Maintaining neutrality and professionalism
-- Employee support & wellbeing
-- Career development benefits
+1. **Partnership** - Understanding the Maytech & AKQA collaboration
+2. **FAQ** - Answers to common questions about payroll, leave, and HR
+3. **Policies & Procedures** - Hybrid work, leave policies, and security guidelines
+4. **Responsibilities** - Clear breakdown of who handles what
+5. **Workflows** - Standard procedures for requests and support
+6. **Workplace Guidelines** - Confidentiality, professionalism, and wellbeing
+7. **Completion** - Congratulations and next steps
 
 ## Technologies Used
 
+### Backend
+- **Node.js** with **Express**: RESTful API and session management
+- **bcryptjs**: Secure password hashing
+- **express-session**: User authentication and session persistence
+- **JSON File Storage**: Lightweight data persistence for users and progress
+
+### Frontend
 - **HTML5**: Semantic markup
 - **CSS3**: Modern styling with flexbox and grid layouts
-- **JavaScript**: Interactive features and animations
-- **No frameworks**: Pure vanilla JavaScript for lightweight performance
+- **Vanilla JavaScript**: No frameworks - fast and lightweight
+
+## Installation
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm (comes with Node.js)
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd maytech-akqa-onboarding
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the server**
+   ```bash
+   npm start
+   ```
+
+   For development with auto-restart:
+   ```bash
+   npm run dev
+   ```
+
+4. **Access the application**
+   - Open your browser and navigate to `http://localhost:3000`
+
+## Default Credentials
+
+### Admin Account
+- **Email**: admin@maytech.com
+- **Password**: admin123
+
+### Demo Staff Account
+- **Email**: staff@maytech.com
+- **Password**: staff123
+
+**Note**: Change these credentials in production!
 
 ## File Structure
 
 ```
 maytech-akqa-onboarding/
-├── index.html           # Main HTML file
-├── styles.css           # All styles and responsive design
-├── script.js            # Interactive features and animations
-├── README.md            # This file
-├── AKQA-Maytech-Refresher.pdf        # Source document 1
-└── AKQA-Maytech-Refresher 2.pdf      # Source document 2
+├── server.js                 # Express server with authentication
+├── package.json              # Dependencies and scripts
+├── .gitignore               # Git ignore rules
+├── README.md                # This file
+├── data/                    # Data directory (auto-created)
+│   ├── users.json          # User accounts
+│   └── progress.json       # Progress tracking
+└── public/                  # Static files served by Express
+    ├── login.html          # Login page
+    ├── onboarding.html     # Staff onboarding interface
+    ├── admin.html          # Admin dashboard
+    ├── onboarding.js       # Onboarding logic
+    ├── admin.js            # Admin dashboard logic
+    ├── styles.css          # Original styles
+    └── onboarding-styles.css  # Onboarding-specific styles
 ```
 
-## How to Use
+## Usage
 
-1. **View Locally**: Simply open `index.html` in any modern web browser
-2. **Host Online**: Upload all files to any web hosting service
-3. **GitHub Pages**: Enable GitHub Pages in repository settings to host automatically
+### For Staff Members
 
-## Browser Support
+1. **Login**: Use your credentials provided by HR
+2. **Read Each Section**: Carefully review the onboarding content
+3. **Acknowledge**: Check the box and click "Acknowledge & Continue"
+4. **Progress**: The system automatically saves your progress
+5. **Resume**: You can logout and resume later from where you left off
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
+### For Administrators
 
-## Key Information Highlights
+1. **Login**: Use admin credentials
+2. **Dashboard**: View real-time statistics and progress overview
+3. **Monitor Progress**: See which staff have completed onboarding
+4. **Add Users**: Create new staff accounts from the dashboard
+5. **Track Details**: View completion dates and percentages
 
-### Hybrid Work Policy
-- **Required**: Tuesday and Thursday in office
-- **Encouraged**: Wednesday in office
-- **Flexible**: Other days at employee discretion
+## API Endpoints
 
-### Payroll
-- Processed between 6th-9th of each month
-- Funds credited to nominated AUD account
-- RCTI provided for compliance
+### Authentication
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+- `GET /api/session` - Check current session
 
-### Contact Points
-- **HR Inquiries**: Maytech HR Manager
-- **Work Matters**: Director of Engineering and Technology
-- **Escalation**: James Freeman, Managing Partner
+### Progress (Staff)
+- `GET /api/progress` - Get current user's progress
+- `POST /api/progress` - Update section acknowledgment
 
-### Required Office Days
-- 2 days per week minimum (Tuesday & Thursday)
-- Wednesday encouraged
-- Must acknowledge policy in BetterHR
+### Admin
+- `GET /api/admin/progress` - Get all staff progress
+- `GET /api/admin/users` - Get all users
+- `POST /api/admin/users` - Create new user
+
+## Security Considerations
+
+- Passwords are hashed using bcrypt
+- Session-based authentication with secure cookies
+- User data stored in JSON files (consider database for production)
+- Admin-only endpoints protected with role-based middleware
+- Input validation on all forms
+
+## Production Deployment
+
+For production use:
+
+1. **Change Default Credentials**: Update admin and demo user passwords
+2. **Use HTTPS**: Enable secure cookies in session config
+3. **Environment Variables**: Store sensitive config in `.env` file
+4. **Database**: Consider migrating from JSON to PostgreSQL/MongoDB
+5. **Backup**: Implement regular backups of `data/` directory
+6. **Monitoring**: Add logging and error tracking
+7. **Rate Limiting**: Implement API rate limiting for security
 
 ## Customization
 
-To customize colors, edit the CSS variables in `styles.css`:
+### Branding
+Edit CSS variables in `public/onboarding-styles.css`:
 
 ```css
 :root {
     --primary-color: #6366f1;
     --secondary-color: #8b5cf6;
-    --accent-color: #ec4899;
-    /* ... more variables */
+    --success-color: #10b981;
+    /* ... customize colors */
 }
 ```
 
-## Maintenance
+### Content
+Update section content in `public/onboarding.html`
 
-To update content:
-1. Edit `index.html` for content changes
-2. Edit `styles.css` for styling updates
-3. Edit `script.js` for functionality changes
+### Number of Sections
+Modify `totalSections` variable in `public/onboarding.js` and `public/admin.js`
+
+## Troubleshooting
+
+**Port already in use**
+```bash
+# Change port in server.js or set PORT environment variable
+PORT=3001 npm start
+```
+
+**Cannot access after login**
+- Clear browser cookies
+- Check browser console for errors
+- Verify session secret is set
+
+**Progress not saving**
+- Check `data/` directory permissions
+- Verify `progress.json` exists
+- Check server logs for errors
+
+## Future Enhancements
+
+- Email notifications for incomplete onboarding
+- Certificate generation upon completion
+- Quiz/assessment integration
+- Multi-language support
+- Mobile app version
+- Integration with HR systems (BetterHR)
+- Video content support
+- PDF export of progress reports
 
 ## Credits
 
-Created based on the official Maytech & AKQA refresher session documents.
+Created for the Maytech & AKQA partnership based on official onboarding materials.
 
 ## License
 
@@ -147,6 +224,7 @@ Created based on the official Maytech & AKQA refresher session documents.
 
 ## Support
 
-For questions about the content, please contact:
-- Maytech HR Manager (HR-related inquiries)
-- Director of Engineering and Technology (Work-related matters)
+For technical issues, please contact:
+- **System Administrator**: system@maytech.com
+- **HR Inquiries**: Maytech HR Manager
+- **General Questions**: Director of Engineering and Technology
