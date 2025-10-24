@@ -8,6 +8,26 @@
   ],
   "routes": [
     {
+      "src": "/api/.*",
+      "dest": "server.js"
+    },
+    {
+      "src": "/(.*\\.(js|css|html|png|jpg|jpeg|gif|svg|ico))",
+      "dest": "public/$1"
+    },
+    {
+      "src": "/onboarding",
+      "dest": "server.js"
+    },
+    {
+      "src": "/admin",
+      "dest": "server.js"
+    },
+    {
+      "src": "/",
+      "dest": "server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "server.js"
     }

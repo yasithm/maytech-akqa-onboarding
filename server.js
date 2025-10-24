@@ -271,10 +271,15 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Maytech & AKQA Onboarding Server running on http://localhost:${PORT}`);
-    console.log('\nDefault credentials:');
-    console.log('Admin: admin@maytech.com / admin123');
-    console.log('Staff: staff@maytech.com / staff123');
-});
+// Export for Vercel serverless
+module.exports = app;
+
+// Start server only when running locally (not on Vercel)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Maytech & AKQA Onboarding Server running on http://localhost:${PORT}`);
+        console.log('\nDefault credentials:');
+        console.log('Admin: admin@maytech.com / admin123');
+        console.log('Staff: staff@maytech.com / staff123');
+    });
+}
