@@ -2,8 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
-const fs = require('fs');
 const path = require('path');
+const prisma = require('./lib/prisma');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,70 +14,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Session configuration
 app.use(session({
-    secret: 'maytech-akqa-onboarding-secret-2025',
+    secret: process.env.SESSION_SECRET || 'maytech-akqa-onboarding-secret-2025-change-in-production',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: process.env.NODE_ENV === 'production', // HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'lax'
     }
 }));
 
-// Data files
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
-const PROGRESS_FILE = path.join(__dirname, 'data', 'progress.json');
-
-// Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-    fs.mkdirSync(path.join(__dirname, 'data'));
-}
-
-// Initialize data files if they don't exist
-function initializeDataFiles() {
-    if (!fs.existsSync(USERS_FILE)) {
-        const defaultUsers = [
-            {
-                id: 1,
-                email: 'admin@maytech.com',
-                password: bcrypt.hashSync('admin123', 10),
-                name: 'Admin User',
-                role: 'admin'
-            },
-            {
-                id: 2,
-                email: 'staff@maytech.com',
-                password: bcrypt.hashSync('staff123', 10),
-                name: 'Demo Staff',
-                role: 'staff'
-            }
-        ];
-        fs.writeFileSync(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
-    }
-
-    if (!fs.existsSync(PROGRESS_FILE)) {
-        fs.writeFileSync(PROGRESS_FILE, JSON.stringify([], null, 2));
-    }
-}
-
-initializeDataFiles();
-
-// Helper functions
-function readUsers() {
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-}
-
-function writeUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-function readProgress() {
-    return JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf8'));
-}
-
-function writeProgress(progress) {
-    fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
-}
+// Database is now managed by Prisma
+// Run `npm run db:init` to create default users
+// Run `npm run db:migrate` to migrate data from JSON files
 
 // Authentication middleware
 function isAuthenticated(req, res, next) {
@@ -96,30 +48,40 @@ function isAdmin(req, res, next) {
 // Routes
 
 // Login
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    const users = readUsers();
-    const user = users.find(u => u.email === email);
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        // Find user by email
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Verify password
+        if (!bcrypt.compareSync(password, user.password)) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Create session
+        req.session.user = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role
+        };
+
+        res.json({
+            success: true,
+            user: req.session.user
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    if (!bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    req.session.user = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role
-    };
-
-    res.json({
-        success: true,
-        user: req.session.user
-    });
 });
 
 // Logout
@@ -138,124 +100,193 @@ app.get('/api/session', (req, res) => {
 });
 
 // Get user progress
-app.get('/api/progress', isAuthenticated, (req, res) => {
-    const allProgress = readProgress();
-    const userProgress = allProgress.find(p => p.userId === req.session.user.id);
+app.get('/api/progress', isAuthenticated, async (req, res) => {
+    try {
+        let userProgress = await prisma.progress.findUnique({
+            where: { userId: req.session.user.id },
+            include: { user: true }
+        });
 
-    if (!userProgress) {
-        const newProgress = {
-            userId: req.session.user.id,
-            userName: req.session.user.name,
-            sections: [],
-            currentSection: 0,
-            completedSections: 0,
-            lastUpdated: new Date().toISOString()
-        };
-        allProgress.push(newProgress);
-        writeProgress(allProgress);
-        return res.json(newProgress);
+        if (!userProgress) {
+            // Create new progress record
+            userProgress = await prisma.progress.create({
+                data: {
+                    userId: req.session.user.id,
+                    sections: [],
+                    currentSection: 0,
+                    completedSections: 0
+                },
+                include: { user: true }
+            });
+        }
+
+        // Format response to match old structure
+        res.json({
+            userId: userProgress.userId,
+            userName: userProgress.user.name,
+            sections: userProgress.sections,
+            currentSection: userProgress.currentSection,
+            completedSections: userProgress.completedSections,
+            lastUpdated: userProgress.lastUpdated.toISOString()
+        });
+    } catch (error) {
+        console.error('Get progress error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    res.json(userProgress);
 });
 
 // Update progress
-app.post('/api/progress', isAuthenticated, (req, res) => {
-    const { sectionId, acknowledged } = req.body;
-    const allProgress = readProgress();
-    let userProgress = allProgress.find(p => p.userId === req.session.user.id);
+app.post('/api/progress', isAuthenticated, async (req, res) => {
+    try {
+        const { sectionId, acknowledged } = req.body;
 
-    if (!userProgress) {
-        userProgress = {
-            userId: req.session.user.id,
-            userName: req.session.user.name,
-            sections: [],
-            currentSection: 0,
-            completedSections: 0,
-            lastUpdated: new Date().toISOString()
-        };
-        allProgress.push(userProgress);
-    }
-
-    // Update section
-    const sectionIndex = userProgress.sections.findIndex(s => s.id === sectionId);
-    if (sectionIndex >= 0) {
-        userProgress.sections[sectionIndex].acknowledged = acknowledged;
-        userProgress.sections[sectionIndex].completedAt = new Date().toISOString();
-    } else {
-        userProgress.sections.push({
-            id: sectionId,
-            acknowledged: acknowledged,
-            completedAt: new Date().toISOString()
+        // Get or create progress record
+        let userProgress = await prisma.progress.findUnique({
+            where: { userId: req.session.user.id },
+            include: { user: true }
         });
+
+        if (!userProgress) {
+            userProgress = await prisma.progress.create({
+                data: {
+                    userId: req.session.user.id,
+                    sections: [],
+                    currentSection: 0,
+                    completedSections: 0
+                },
+                include: { user: true }
+            });
+        }
+
+        // Update section data
+        let sections = Array.isArray(userProgress.sections) ? userProgress.sections : [];
+        const sectionIndex = sections.findIndex(s => s.id === sectionId);
+
+        if (sectionIndex >= 0) {
+            sections[sectionIndex].acknowledged = acknowledged;
+            sections[sectionIndex].completedAt = new Date().toISOString();
+        } else {
+            sections.push({
+                id: sectionId,
+                acknowledged: acknowledged,
+                completedAt: new Date().toISOString()
+            });
+        }
+
+        // Calculate counters
+        const completedSections = sections.filter(s => s.acknowledged).length;
+        const currentSection = Math.min(completedSections, 6); // 7 sections total (0-6)
+
+        // Update progress in database
+        userProgress = await prisma.progress.update({
+            where: { userId: req.session.user.id },
+            data: {
+                sections: sections,
+                currentSection: currentSection,
+                completedSections: completedSections
+            },
+            include: { user: true }
+        });
+
+        // Format response to match old structure
+        res.json({
+            userId: userProgress.userId,
+            userName: userProgress.user.name,
+            sections: userProgress.sections,
+            currentSection: userProgress.currentSection,
+            completedSections: userProgress.completedSections,
+            lastUpdated: userProgress.lastUpdated.toISOString()
+        });
+    } catch (error) {
+        console.error('Update progress error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    // Update counters
-    userProgress.completedSections = userProgress.sections.filter(s => s.acknowledged).length;
-    userProgress.currentSection = Math.min(userProgress.completedSections, 6); // 7 sections total (0-6)
-    userProgress.lastUpdated = new Date().toISOString();
-
-    // Save
-    const progressIndex = allProgress.findIndex(p => p.userId === req.session.user.id);
-    if (progressIndex >= 0) {
-        allProgress[progressIndex] = userProgress;
-    }
-    writeProgress(allProgress);
-
-    res.json(userProgress);
 });
 
 // Admin: Get all progress
-app.get('/api/admin/progress', isAuthenticated, isAdmin, (req, res) => {
-    const allProgress = readProgress();
-    const users = readUsers();
+app.get('/api/admin/progress', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const allProgress = await prisma.progress.findMany({
+            include: { user: true },
+            orderBy: { lastUpdated: 'desc' }
+        });
 
-    // Enrich progress data with user info
-    const enrichedProgress = allProgress.map(p => {
-        const user = users.find(u => u.id === p.userId);
-        return {
-            ...p,
-            userName: user ? user.name : 'Unknown',
-            userEmail: user ? user.email : 'Unknown'
-        };
-    });
+        // Format response to match old structure
+        const enrichedProgress = allProgress.map(p => ({
+            userId: p.userId,
+            userName: p.user.name,
+            userEmail: p.user.email,
+            sections: p.sections,
+            currentSection: p.currentSection,
+            completedSections: p.completedSections,
+            lastUpdated: p.lastUpdated.toISOString()
+        }));
 
-    res.json(enrichedProgress);
+        res.json(enrichedProgress);
+    } catch (error) {
+        console.error('Get all progress error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 // Admin: Create new user
-app.post('/api/admin/users', isAuthenticated, isAdmin, (req, res) => {
-    const { email, password, name } = req.body;
-    const users = readUsers();
+app.post('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { email, password, name } = req.body;
 
-    if (users.find(u => u.email === email)) {
-        return res.status(400).json({ error: 'User already exists' });
+        // Check if user already exists
+        const existing = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        if (existing) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
+        // Create new user
+        const newUser = await prisma.user.create({
+            data: {
+                email,
+                password: bcrypt.hashSync(password, 10),
+                name,
+                role: 'staff'
+            }
+        });
+
+        res.json({
+            success: true,
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                name: newUser.name,
+                role: newUser.role
+            }
+        });
+    } catch (error) {
+        console.error('Create user error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    const newUser = {
-        id: Math.max(...users.map(u => u.id), 0) + 1,
-        email,
-        password: bcrypt.hashSync(password, 10),
-        name,
-        role: 'staff'
-    };
-
-    users.push(newUser);
-    writeUsers(users);
-
-    res.json({ success: true, user: { id: newUser.id, email: newUser.email, name: newUser.name } });
 });
 
 // Admin: Get all users
-app.get('/api/admin/users', isAuthenticated, isAdmin, (req, res) => {
-    const users = readUsers();
-    const safeUsers = users.map(u => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        role: u.role
-    }));
-    res.json(safeUsers);
+app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const users = await prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                createdAt: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        res.json(users);
+    } catch (error) {
+        console.error('Get users error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 // Serve HTML pages
@@ -271,10 +302,15 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Maytech & AKQA Onboarding Server running on http://localhost:${PORT}`);
-    console.log('\nDefault credentials:');
-    console.log('Admin: admin@maytech.com / admin123');
-    console.log('Staff: staff@maytech.com / staff123');
-});
+// Export for Vercel serverless
+module.exports = app;
+
+// Start server only when running locally (not on Vercel)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Maytech & AKQA Onboarding Server running on http://localhost:${PORT}`);
+        console.log('\nDefault credentials:');
+        console.log('Admin: admin@maytech.com / admin123');
+        console.log('Staff: staff@maytech.com / staff123');
+    });
+}

@@ -37,22 +37,30 @@ This application provides a complete onboarding solution with staff authenticati
 
 ### Backend
 - **Node.js** with **Express**: RESTful API and session management
+- **PostgreSQL**: Production-ready relational database
+- **Prisma ORM**: Type-safe database access and migrations
 - **bcryptjs**: Secure password hashing
 - **express-session**: User authentication and session persistence
-- **JSON File Storage**: Lightweight data persistence for users and progress
 
 ### Frontend
 - **HTML5**: Semantic markup
 - **CSS3**: Modern styling with flexbox and grid layouts
 - **Vanilla JavaScript**: No frameworks - fast and lightweight
 
+### Deployment
+- **Vercel**: Serverless deployment platform
+- **Vercel Postgres**: Managed PostgreSQL database
+
 ## Installation
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - npm (comes with Node.js)
+- PostgreSQL database (local or cloud-hosted)
 
 ### Setup
+
+#### Option A: Quick Setup with Vercel Postgres (Recommended)
 
 1. **Clone the repository**
    ```bash
@@ -65,7 +73,42 @@ This application provides a complete onboarding solution with staff authenticati
    npm install
    ```
 
-3. **Start the server**
+3. **Set up Vercel Postgres**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Create a new Postgres database or use existing one
+   - Go to the `.env.local` tab and copy the environment variables
+   - Create a `.env` file in your project root
+
+4. **Configure environment variables**
+
+   Copy `.env.example` to `.env` and fill in your database credentials:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Your `.env` should look like:
+   ```env
+   POSTGRES_PRISMA_URL="postgres://default:***@***-pooler.*.postgres.vercel-storage.com/verceldb?sslmode=require&pgbouncer=true"
+   POSTGRES_URL_NON_POOLING="postgres://default:***@***.*.postgres.vercel-storage.com/verceldb?sslmode=require"
+   SESSION_SECRET="your-secure-random-secret-here"
+   NODE_ENV="development"
+   ```
+
+5. **Run database migrations**
+   ```bash
+   npm run db:push
+   ```
+
+   This creates all the necessary tables in your database.
+
+6. **Initialize default users**
+   ```bash
+   npm run db:init
+   ```
+
+   This creates the default admin and demo staff accounts.
+
+7. **Start the server**
    ```bash
    npm start
    ```
@@ -75,8 +118,42 @@ This application provides a complete onboarding solution with staff authenticati
    npm run dev
    ```
 
-4. **Access the application**
+8. **Access the application**
    - Open your browser and navigate to `http://localhost:3000`
+
+#### Option B: Local PostgreSQL Setup
+
+1. **Install PostgreSQL**
+   - macOS: `brew install postgresql`
+   - Ubuntu: `sudo apt install postgresql`
+   - Windows: Download from [postgresql.org](https://www.postgresql.org/download/)
+
+2. **Create database**
+   ```bash
+   createdb maytech_onboarding
+   ```
+
+3. **Configure environment variables**
+
+   Create `.env` file:
+   ```env
+   POSTGRES_PRISMA_URL="postgresql://username:password@localhost:5432/maytech_onboarding"
+   POSTGRES_URL_NON_POOLING="postgresql://username:password@localhost:5432/maytech_onboarding"
+   SESSION_SECRET="your-secure-random-secret-here"
+   NODE_ENV="development"
+   ```
+
+4. **Follow steps 5-8 from Option A**
+
+#### Migrating from JSON Files (Legacy)
+
+If you have existing data in `data/users.json` and `data/progress.json`:
+
+```bash
+npm run db:migrate-json
+```
+
+This will transfer all users and progress data to the database.
 
 ## Default Credentials
 
@@ -97,10 +174,19 @@ maytech-akqa-onboarding/
 ├── server.js                 # Express server with authentication
 ├── package.json              # Dependencies and scripts
 ├── .gitignore               # Git ignore rules
+├── .env                     # Environment variables (not in git)
+├── .env.example            # Example environment configuration
 ├── README.md                # This file
-├── data/                    # Data directory (auto-created)
-│   ├── users.json          # User accounts
-│   └── progress.json       # Progress tracking
+├── prisma/                  # Prisma ORM configuration
+│   └── schema.prisma       # Database schema
+├── lib/                     # Shared libraries
+│   └── prisma.js           # Prisma client instance
+├── scripts/                 # Utility scripts
+│   ├── init-db.js          # Initialize default users
+│   └── migrate-json-to-db.js  # Migrate from JSON files
+├── data/                    # Legacy JSON files (optional)
+│   ├── users.json          # Legacy user accounts
+│   └── progress.json       # Legacy progress tracking
 └── public/                  # Static files served by Express
     ├── login.html          # Login page
     ├── onboarding.html     # Staff onboarding interface
@@ -145,25 +231,124 @@ maytech-akqa-onboarding/
 - `GET /api/admin/users` - Get all users
 - `POST /api/admin/users` - Create new user
 
+## Database Management
+
+### Available Scripts
+
+- `npm run db:generate` - Generate Prisma Client
+- `npm run db:migrate` - Create and apply migrations (development)
+- `npm run db:migrate:deploy` - Apply migrations (production)
+- `npm run db:push` - Push schema changes to database (quick prototyping)
+- `npm run db:studio` - Open Prisma Studio (database GUI)
+- `npm run db:init` - Initialize database with default users
+- `npm run db:migrate-json` - Migrate data from legacy JSON files
+
+### Database Schema
+
+**Users Table**
+- `id` - Auto-incrementing primary key
+- `email` - Unique email address
+- `password` - Bcrypt hashed password
+- `name` - User's full name
+- `role` - 'admin' or 'staff'
+- `createdAt` - Account creation timestamp
+- `updatedAt` - Last update timestamp
+
+**Progress Table**
+- `id` - Auto-incrementing primary key
+- `userId` - Foreign key to Users (unique, one-to-one)
+- `currentSection` - Current section index (0-6)
+- `completedSections` - Count of completed sections
+- `sections` - JSON array of section completion data
+- `lastUpdated` - Last progress update timestamp
+- `createdAt` - Progress creation timestamp
+
+**Sessions Table**
+- `id` - Session identifier
+- `sid` - Session ID (unique)
+- `data` - Session data (JSON)
+- `expiresAt` - Session expiration timestamp
+
+### Backup and Restore
+
+**Export data** (using Prisma Studio):
+```bash
+npm run db:studio
+```
+
+**Backup database** (PostgreSQL):
+```bash
+pg_dump -U username -d maytech_onboarding > backup.sql
+```
+
+**Restore database**:
+```bash
+psql -U username -d maytech_onboarding < backup.sql
+```
+
 ## Security Considerations
 
-- Passwords are hashed using bcrypt
+- Passwords are hashed using bcrypt with salt rounds
 - Session-based authentication with secure cookies
-- User data stored in JSON files (consider database for production)
+- PostgreSQL database with Prisma ORM for type-safe queries
+- Environment variables for sensitive configuration
 - Admin-only endpoints protected with role-based middleware
 - Input validation on all forms
+- SQL injection protection via Prisma parameterized queries
+- HTTPS enforced in production (Vercel)
 
 ## Production Deployment
 
-For production use:
+### Deploying to Vercel
 
-1. **Change Default Credentials**: Update admin and demo user passwords
-2. **Use HTTPS**: Enable secure cookies in session config
-3. **Environment Variables**: Store sensitive config in `.env` file
-4. **Database**: Consider migrating from JSON to PostgreSQL/MongoDB
-5. **Backup**: Implement regular backups of `data/` directory
-6. **Monitoring**: Add logging and error tracking
-7. **Rate Limiting**: Implement API rate limiting for security
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Create Vercel Project**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Import your GitHub repository
+   - Vercel will auto-detect the Express.js app
+
+3. **Set up Vercel Postgres**
+   - In your Vercel project, go to Storage tab
+   - Create a new Postgres database
+   - Vercel will automatically set environment variables
+
+4. **Configure Environment Variables**
+   - Go to Project Settings → Environment Variables
+   - Add `SESSION_SECRET` with a strong random value
+   - `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` are auto-set by Vercel
+
+5. **Run Database Migrations**
+
+   After deployment, use Vercel CLI to initialize the database:
+   ```bash
+   vercel env pull .env.local
+   npm run db:push
+   npm run db:init
+   ```
+
+   Or connect to your database directly via Vercel dashboard.
+
+6. **Deploy**
+   ```bash
+   vercel --prod
+   ```
+
+### Production Checklist
+
+1. ✅ **Change Default Credentials**: Update admin password after first login
+2. ✅ **HTTPS Enabled**: Vercel provides automatic HTTPS
+3. ✅ **Environment Variables**: All secrets in Vercel environment config
+4. ✅ **Database**: PostgreSQL with automatic backups (Vercel Postgres)
+5. ✅ **Monitoring**: Enable Vercel Analytics and logging
+6. ✅ **Session Security**: Secure cookies enabled in production
+7. 🔲 **Rate Limiting**: Consider adding API rate limiting
+8. 🔲 **Email Notifications**: Set up email alerts for new users
 
 ## Customization
 
@@ -193,15 +378,38 @@ Modify `totalSections` variable in `public/onboarding.js` and `public/admin.js`
 PORT=3001 npm start
 ```
 
+**Database connection error**
+- Verify `.env` file exists with correct database URLs
+- Check database is running (local) or accessible (cloud)
+- Ensure `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` are set
+- Try running `npm run db:push` to sync schema
+
+**Prisma Client not generated**
+```bash
+npm run db:generate
+```
+
 **Cannot access after login**
 - Clear browser cookies
 - Check browser console for errors
-- Verify session secret is set
+- Verify `SESSION_SECRET` is set in `.env`
+- Check server logs for database errors
 
 **Progress not saving**
-- Check `data/` directory permissions
-- Verify `progress.json` exists
-- Check server logs for errors
+- Check database connection
+- Verify Progress table exists: `npm run db:studio`
+- Check server logs for Prisma errors
+- Ensure user has valid session
+
+**Migration errors**
+```bash
+# Reset database (CAUTION: deletes all data)
+npx prisma migrate reset
+
+# Then re-initialize
+npm run db:push
+npm run db:init
+```
 
 ## Future Enhancements
 
