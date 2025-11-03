@@ -13,7 +13,10 @@ const PORT = process.env.PORT || 3000;
 // In local development, __dirname is the project root (when running from api/)
 const ROOT_DIR = __dirname.includes('/api') ? path.join(__dirname, '..') : __dirname;
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
-const DATA_DIR = path.join(ROOT_DIR, 'data');
+
+// For Vercel serverless, use /tmp (writable), otherwise use data/ directory
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL_URL;
+const DATA_DIR = IS_VERCEL ? '/tmp/data' : path.join(ROOT_DIR, 'data');
 
 // Middleware
 app.use(bodyParser.json());
@@ -25,7 +28,10 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'maytech-akqa-onboarding-se
 const isProduction = process.env.NODE_ENV === 'production';
 const isHTTPS = process.env.VERCEL_URL ? true : false; // Vercel provides HTTPS
 
+// Use memory store for sessions in Vercel (serverless functions are stateless)
+const MemoryStore = require('express-session').MemoryStore;
 app.use(session({
+    store: IS_VERCEL ? new MemoryStore() : undefined, // Use memory store in Vercel
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -40,55 +46,121 @@ app.use(session({
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Initialize data files if they don't exist
+// Initialize data files - gracefully handle errors for serverless environments
 function initializeDataFiles() {
-    if (!fs.existsSync(USERS_FILE)) {
-        const defaultUsers = [
-            {
-                id: 1,
-                email: 'admin@maytech.com',
-                password: bcrypt.hashSync('admin123', 10),
-                name: 'Admin User',
-                role: 'admin'
-            },
-            {
-                id: 2,
-                email: 'staff@maytech.com',
-                password: bcrypt.hashSync('staff123', 10),
-                name: 'Demo Staff',
-                role: 'staff'
+    try {
+        // Try to create data directory (will fail silently in read-only filesystems)
+        if (!fs.existsSync(DATA_DIR)) {
+            try {
+                fs.mkdirSync(DATA_DIR, { recursive: true });
+            } catch (err) {
+                // Ignore errors - might be read-only filesystem
+                console.warn('Could not create data directory:', err.message);
             }
-        ];
-        fs.writeFileSync(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
-    }
+        }
 
-    if (!fs.existsSync(PROGRESS_FILE)) {
-        fs.writeFileSync(PROGRESS_FILE, JSON.stringify([], null, 2));
+        // Only initialize files if directory is writable
+        try {
+            if (!fs.existsSync(USERS_FILE)) {
+                const defaultUsers = [
+                    {
+                        id: 1,
+                        email: 'admin@maytech.com',
+                        password: bcrypt.hashSync('admin123', 10),
+                        name: 'Admin User',
+                        role: 'admin'
+                    },
+                    {
+                        id: 2,
+                        email: 'staff@maytech.com',
+                        password: bcrypt.hashSync('staff123', 10),
+                        name: 'Demo Staff',
+                        role: 'staff'
+                    }
+                ];
+                fs.writeFileSync(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
+            }
+
+            if (!fs.existsSync(PROGRESS_FILE)) {
+                fs.writeFileSync(PROGRESS_FILE, JSON.stringify([], null, 2));
+            }
+        } catch (err) {
+            console.warn('Could not initialize data files:', err.message);
+        }
+    } catch (err) {
+        // Don't fail the entire deployment if data initialization fails
+        console.warn('Data initialization warning:', err.message);
     }
 }
 
+// Initialize data files (non-blocking)
 initializeDataFiles();
 
-// Helper functions
+// Helper functions - with error handling for serverless environments
 function readUsers() {
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    try {
+        if (fs.existsSync(USERS_FILE)) {
+            return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        }
+    } catch (err) {
+        console.warn('Error reading users file:', err.message);
+    }
+    
+    // Return default users if file doesn't exist or can't be read
+    // Using pre-hashed passwords to ensure consistency (from existing users.json)
+    return [
+        {
+            id: 1,
+            email: 'admin@maytech.com',
+            password: '$2a$10$yVDaObtbmZHJLce8vvrG8O58M9mhrDtreFmDF59rC11YeiJ3b1ImC', // admin123
+            name: 'Admin User',
+            role: 'admin'
+        },
+        {
+            id: 2,
+            email: 'staff@maytech.com',
+            password: '$2a$10$K5vube2Zjdh4Z6xb0G4VYeXe.oFnClgH3mtgk1Akz1aY8GdRuThI.', // staff123
+            name: 'Demo Staff',
+            role: 'staff'
+        }
+    ];
 }
 
 function writeUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    try {
+        // Ensure directory exists
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    } catch (err) {
+        console.warn('Error writing users file:', err.message);
+        // In serverless, this will fail silently - consider using a database
+    }
 }
 
 function readProgress() {
-    return JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf8'));
+    try {
+        if (fs.existsSync(PROGRESS_FILE)) {
+            return JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf8'));
+        }
+    } catch (err) {
+        console.warn('Error reading progress file:', err.message);
+    }
+    return [];
 }
 
 function writeProgress(progress) {
-    fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
+    try {
+        // Ensure directory exists
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
+    } catch (err) {
+        console.warn('Error writing progress file:', err.message);
+        // In serverless, this will fail silently - consider using a database
+    }
 }
 
 // Authentication middleware
