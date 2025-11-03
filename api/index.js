@@ -8,28 +8,41 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Determine root directory - works for both local and Vercel
+// In Vercel serverless, __dirname is api/, so we go up one level
+// In local development, __dirname is the project root (when running from api/)
+const ROOT_DIR = __dirname.includes('/api') ? path.join(__dirname, '..') : __dirname;
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
+const DATA_DIR = path.join(ROOT_DIR, 'data');
+
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(PUBLIC_DIR));
+
+// Session configuration with environment variables
+const SESSION_SECRET = process.env.SESSION_SECRET || 'maytech-akqa-onboarding-secret-2025';
+const isProduction = process.env.NODE_ENV === 'production';
+const isHTTPS = process.env.VERCEL_URL ? true : false; // Vercel provides HTTPS
 
 app.use(session({
-    secret: 'maytech-akqa-onboarding-secret-2025',
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: isHTTPS || isProduction, // Secure cookies in production/HTTPS
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'lax'
     }
 }));
 
 // Data files
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
-const PROGRESS_FILE = path.join(__dirname, 'data', 'progress.json');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
 
 // Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-    fs.mkdirSync(path.join(__dirname, 'data'));
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 // Initialize data files if they don't exist
@@ -260,15 +273,15 @@ app.get('/api/admin/users', isAuthenticated, isAdmin, (req, res) => {
 
 // Serve HTML pages
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(PUBLIC_DIR, 'login.html'));
 });
 
 app.get('/onboarding', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'onboarding.html'));
+    res.sendFile(path.join(PUBLIC_DIR, 'onboarding.html'));
 });
 
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+    res.sendFile(path.join(PUBLIC_DIR, 'admin.html'));
 });
 
 // Export for Vercel serverless

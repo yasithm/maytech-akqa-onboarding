@@ -13,13 +13,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Session configuration with environment variables
+const SESSION_SECRET = process.env.SESSION_SECRET || 'maytech-akqa-onboarding-secret-2025';
+const isProduction = process.env.NODE_ENV === 'production';
+const isHTTPS = process.env.VERCEL_URL ? true : false; // Vercel provides HTTPS
+
 app.use(session({
-    secret: 'maytech-akqa-onboarding-secret-2025',
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: isHTTPS || isProduction, // Secure cookies in production/HTTPS
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'lax'
     }
 }));
 
